@@ -1,72 +1,151 @@
 #include "Sort.h"
 #include <stdio.h>
 
-void swap_elems_queue(Queue* q, int i, int j)
+static Elem* find_min_elem(Elem* start) 
 {
-    int val_i, val_j;
-    get_at(q, i, &val_i);
-    get_at(q, j, &val_j);
-    set_at(q, i, val_j);
-    set_at(q, j, val_i);
+    if (start == NULL) return NULL;
+    Elem* min_elem = start;
+    Elem* current = start->link;
+    while (current != NULL) 
+    {
+        if (current->data < min_elem->data) 
+        {
+            min_elem = current;
+        }
+        current = current->link;
+    }
+    return min_elem;
 }
 
-void selection_sort_queue(Queue* q)
+void selection_sort_queue(Queue* q) 
 {
-    int n = queue_size(q);
-    for (int i = 0; i < n - 1; i++)
+    if (q->size <= 1) return;
+    Elem* sorted_end = NULL;  
+    while (sorted_end != q->EndQ) 
     {
-        int min_idx = i;
-        int min_val, current_val;
-        get_at(q, i, &min_val);
-        for (int j = i + 1; j < n; j++)
+        Elem* start_search = (sorted_end == NULL) ? q->BegQ : sorted_end->link;
+        Elem* min_elem = find_min_elem(start_search);
+        if (min_elem != start_search) 
         {
-            get_at(q, j, &current_val);
-            if (current_val < min_val)
+            Elem* prev_min = get_prev_elem(q, min_elem);
+            extract_elem(q, prev_min, min_elem);
+            if (sorted_end == NULL) 
             {
-                min_val = current_val;
-                min_idx = j;
+                insert_after(q, NULL, min_elem);
+            } else 
+            {
+                insert_after(q, sorted_end, min_elem);
             }
-        }
-        if (min_idx != i)
+            sorted_end = min_elem;
+        } 
+        else 
         {
-            swap_elems_queue(q, i, min_idx);
+            sorted_end = min_elem;
         }
     }
 }
 
-int partition_queue(Queue* q, int left, int right)
+static Elem* partition_queue(Elem* start, Elem* end, Elem** new_start, Elem** new_end) 
 {
-    int pivot, pivot_val;
-    get_at(q, right, &pivot_val);
-    pivot = pivot_val;
-    int i = left - 1;
-    for (int j = left; j < right; j++)
+    Elem* pivot = end;
+    Elem* prev = NULL;
+    Elem* current = start;
+    Elem* tail = pivot;
+    
+    while (current != pivot) 
     {
-        int current_val;
-        get_at(q, j, &current_val);
-        if (current_val <= pivot)
+        if (current->data < pivot->data) 
         {
-            i++;
-            swap_elems_queue(q, i, j);
+            if (*new_start == NULL) 
+            {
+                *new_start = current;
+            }
+            prev = current;
+            current = current->link;
+        } 
+        else 
+        {
+            Elem* link = current->link;
+            if (prev) 
+            {
+                prev->link = link;
+            }
+            if (start == current) 
+            {
+                start = link;  // Обновляем начало, если удаляем первый элемент
+            }
+            current->link = NULL;
+            tail->link = current;
+            tail = current;
+            current = link;
         }
     }
-    swap_elems_queue(q, i + 1, right);
-    return i + 1;
-}
-
-void quick_sort_recursive(Queue* q, int left, int right)
-{
-    if (left < right)
+    
+    if (*new_start == NULL) 
     {
-        int pi = partition_queue(q, left, right);
-        quick_sort_recursive(q, left, pi - 1);
-        quick_sort_recursive(q, pi + 1, right);
+        *new_start = pivot;
     }
+    *new_end = tail;
+    return pivot;
 }
 
-void quick_sort_queue(Queue* q)
+// Рекурсивная функция быстрой сортировки
+static Elem* quick_sort_recursive(Elem* start, Elem* end) 
 {
-    int size = queue_size(q);
-    if (size <= 1) return;
-    quick_sort_recursive(q, 0, size - 1);
+    if (start == NULL || start == end) 
+    {
+        return start;
+    }
+    
+    Elem* new_start = NULL;
+    Elem* new_end = NULL;
+    Elem* pivot = partition_queue(start, end, &new_start, &new_end);
+    
+    // Если есть элементы слева от pivot
+    if (new_start != pivot) 
+    {
+        Elem* temp = new_start;
+        while (temp->link != pivot) 
+        {
+            temp = temp->link;
+        }
+        temp->link = NULL;
+        
+        new_start = quick_sort_recursive(new_start, temp);
+        
+        // Находим конец левой части
+        temp = new_start;
+        while (temp->link != NULL) 
+        {
+            temp = temp->link;
+        }
+        temp->link = pivot;
+    }
+    
+    // Сортируем правую часть
+    if (pivot != new_end && pivot->link != NULL) 
+    {
+        pivot->link = quick_sort_recursive(pivot->link, new_end);
+    }
+    
+    return new_start;
+}
+
+// Основная функция сортировки очереди
+void quick_sort_queue(Queue* q) 
+{
+    if (q->size <= 1) return;
+    
+    Elem* start = q->BegQ;
+    Elem* end = q->EndQ;
+    
+    q->BegQ = quick_sort_recursive(start, end);
+    
+    // Обновляем конец очереди
+    Elem* current = q->BegQ;
+    while (current != NULL && current->link != NULL) 
+    {
+        current = current->link;
+    }
+    q->EndQ = current;
 }

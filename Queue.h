@@ -1,26 +1,30 @@
 #ifndef QUEUE_H
 #define QUEUE_H
+#include<stdio.h>
 
 typedef struct Elem {
     int data;
-    struct Elem* next;
+    struct Elem* link;
 } Elem;
 
 typedef struct {
-    Elem* front;
-    Elem* rear;
+    Elem* BegQ;
+    Elem* EndQ;
     int size;
-} Queue;
+}Queue; 
 
-void init_queue(Queue* q);
-int enqueue(Queue* q, int value);
-int dequeue(Queue* q, int* value);
+int initialize(Queue* q);
+int append(Queue* q, int value);
+int delete(Queue* q, int* value);
 void clear_queue(Queue* q);
 int queue_size(Queue* q);
 int copy_queue(Queue* dest, Queue* src);
-void print_queue(Queue* q);
+int print_queue(Queue* q);
+int print_to_file(Queue* q, FILE* file);
 int is_empty(Queue* q);
-int get_at(Queue* q, int index, int* value);
-int set_at(Queue* q, int index, int value);
+Elem* get_elem_at(Queue* q, int index);
+Elem* get_prev_elem(Queue* q, Elem* target);
+int extract_elem(Queue* q, Elem* prev, Elem* elem);
+int insert_after(Queue* q, Elem* prev, Elem* elem);
 
 #endif

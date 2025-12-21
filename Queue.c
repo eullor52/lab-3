@@ -2,141 +2,201 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void init_queue(Queue* q)
+int initialize(Queue* q) 
 {
-    q->front = NULL;
-    q->rear = NULL;
+    if (!q) return 1;
+    q->BegQ = NULL;
+    q->EndQ = NULL;
     q->size = 0;
+    return 0;
 }
 
-int enqueue(Queue* q, int value)
+int append(Queue* q, int value) 
 {
     Elem* new_elem = (Elem*)malloc(sizeof(Elem));
-    if (!new_elem)
+    if (!new_elem) 
     {
-        fprintf(stderr, "Ошибка: не удалось выделить память для элемента очереди\n");
+        fprintf(stderr, "РћС€РёР±РєР°: РЅРµ СѓРґР°Р»РѕСЃСЊ РІС‹РґРµР»РёС‚СЊ РїР°РјСЏС‚СЊ РґР»СЏ СЌР»РµРјРµРЅС‚Р° РѕС‡РµСЂРµРґРё\n");
         return 0;
     }
     new_elem->data = value;
-    new_elem->next = NULL;
-    if (q->rear == NULL)
+    new_elem->link = NULL;
+    if (q->EndQ == NULL)
     {
-        q->front = new_elem;
+        q->BegQ = new_elem;
     }
-    else
+    else 
     {
-        q->rear->next = new_elem;
+        q->EndQ->link = new_elem;
     }
-    q->rear = new_elem;
+    q->EndQ = new_elem;
     q->size++;
     return 1;
 }
 
-int dequeue(Queue* q, int* value)
+int delete(Queue* q, int* value) 
 {
-    if (q->front == NULL)
-    {
-        fprintf(stderr, "Ошибка: попытка удаления из пустой очереди\n");
-        return 0;
-    }
-    Elem* temp = q->front;
+    if (q->BegQ == NULL)  return 0;
+    Elem* temp = q->BegQ;
     *value = temp->data;
-    q->front = q->front->next;
-    if (q->front == NULL)
+    q->BegQ = q->BegQ->link;
+    if (q->BegQ == NULL) 
     {
-        q->rear = NULL;
+        q->EndQ = NULL;
     }
     free(temp);
     q->size--;
     return 1;
 }
 
-void clear_queue(Queue* q)
+void clear_queue(Queue* q) 
 {
     int value;
-    while (!is_empty(q))
+    while (!is_empty(q)) 
     {
-        dequeue(q, &value);
+        delete(q, &value);
     }
 }
 
-int queue_size(Queue* q)
+int queue_size(Queue* q) 
 {
     return q->size;
 }
 
-int copy_queue(Queue* dest, Queue* src)
+int copy_queue(Queue* dest, Queue* src) 
 {
-    init_queue(dest);
-    Elem* current = src->front;
-    while (current != NULL)
+    initialize(dest);
+    Elem* current = src->BegQ;
+    while (current != NULL) 
     {
-        if (!enqueue(dest, current->data))
+        if (!append(dest, current->data)) 
         {
             clear_queue(dest);
             return 0;
         }
-        current = current->next;
+        current = current->link;
     }
     return 1;
 }
 
-void print_queue(Queue* q)
+int print_queue(Queue* q) 
 {
-    if (is_empty(q))
+    if (is_empty(q)) 
     {
-        printf("(пусто)\n");
-        return;
+        printf("(РїСѓСЃС‚Рѕ)\n");
+        return 0;
     }
-    Elem* current = q->front;
+    Elem* current = q->BegQ;
     int count = 0;
-    while (current != NULL)
+    while (current != NULL) 
     {
         printf("%d ", current->data);
-        current = current->next;
+        current = current->link;
         count++;
-        if (count % 10 == 0 && current != NULL)
+        if (count % 10 == 0 && current != NULL) 
         {
-            printf("\n");
+            puts("");
         }
     }
-    printf("\n");
+    puts("");
+    return count;
 }
 
-int is_empty(Queue* q)
+int print_to_file(Queue* q, FILE* file) 
 {
-    return q->front == NULL;
+    if (is_empty(q)) return 0;
+    Elem* current = q->BegQ;
+    int count = 0;
+    while (current != NULL) 
+    {
+        fprintf(file, "%d ", current->data);
+        current = current->link;
+        count++;
+        if (count % 20 == 0 && current != NULL) fputc(10,file);
+    }
+    return count;
+    fputc(10,file);
 }
 
-int get_at(Queue* q, int index, int* value)
+int is_empty(Queue* q) 
 {
-    if (index < 0 || index >= q->size)
+    return q->BegQ == NULL;
+}
+
+Elem* get_elem_at(Queue* q, int index) 
+{
+    if (index < 0 || index >= q->size) 
     {
-        fprintf(stderr, "Ошибка: индекс %d выходит за пределы очереди (размер: %d)\n", index, q->size);
-        return 0;
+        return NULL;
     }
-    Elem* current = q->front;
-    for (int i = 0; i < index; i++)
+    Elem* current = q->BegQ;
+    for (int i = 0; i < index; i++) 
     {
-        current = current->next;
+        current = current->link;
     }
-    *value = current->data;
+    return current;
+}
+
+Elem* get_prev_elem(Queue* q, Elem* target) 
+{
+    if (q->BegQ == NULL || target == q->BegQ) 
+    {
+        return NULL;
+    }
+    Elem* current = q->BegQ;
+    while (current != NULL && current->link != target) 
+    {
+        current = current->link;
+    }
+    return current;
+}
+
+int extract_elem(Queue* q, Elem* prev, Elem* elem) 
+{
+    if (elem == NULL) return 0;
+    if (prev == NULL) 
+    {
+        q->BegQ = elem->link;
+        if (q->BegQ == NULL) 
+        {
+            q->EndQ = NULL;
+        }
+    } 
+    else 
+    {
+        prev->link = elem->link;
+        if (elem == q->EndQ)
+        {
+            q->EndQ = prev;
+        }
+    }
+    elem->link = NULL;
+    q->size--;
     return 1;
 }
 
-int set_at(Queue* q, int index, int value)
+int insert_after(Queue* q, Elem* prev, Elem* elem) 
 {
-    if (index < 0 || index >= q->size)
+    if (elem == NULL) return 0;
+    
+    if (prev == NULL) 
     {
-        fprintf(stderr, "Ошибка: индекс %d выходит за пределы очереди (размер: %d)\n", index, q->size);
-        return 0;
-    }
-    Elem* current = q->front;
-    for (int i = 0; i < index; i++)
+        elem->link = q->BegQ;
+        q->BegQ = elem;
+        if (q->EndQ == NULL) 
+        {
+            q->EndQ = elem;
+        }
+    } 
+    else 
     {
-        current = current->next;
+        elem->link = prev->link;
+        prev->link = elem;
+        if (prev == q->EndQ) 
+        {
+            q->EndQ = elem;
+        }
     }
-
-    current->data = value;
+    q->size++;
     return 1;
 }
