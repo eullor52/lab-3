@@ -7,18 +7,22 @@
 
 int main(int argc, char** argv)
 {
-    // Проверка количества аргументов
+    int err;
     if (argc < 3) 
     {
         printf("Использование:\n");
         printf("  %s -file <имя_файла>\n", argv[0]);
+        printf("  %s -sort\n", argv[0]);
         return 1;
     }
-    
-    // Обработка аргументов
+
     if (strcmp(argv[1], "-file") == 0)
     {
-        return file_work(argv[2]);  // Передаем имя файла
+        err = file_work(argv[2]);
+        puts("Введите новую очередь:");
+        FILE* input = fopen("input.txt","w");
+        read_queue(input);
+        fclose(input);
     }
     else if (strcmp(argv[1], "-time") == 0)
     {
@@ -27,9 +31,11 @@ int main(int argc, char** argv)
     else
     {
         printf("Неизвестный параметр: %s\n", argv[1]);
-        printf("Доступные параметры: -file <имя_файла>\n");
+        puts("Доступные параметры:");
+        puts("-file <имя_файла>");
+        puts("-sort");
         return 1;
     }
     
-    return 0;
+    return err;
 }

@@ -16,7 +16,7 @@ int append(Queue* q, int value)
     Elem* new_elem = (Elem*)malloc(sizeof(Elem));
     if (!new_elem) 
     {
-        fprintf(stderr, "Ошибка: не удалось выделить память для элемента очереди\n");
+        fprintf(stderr, "Ошибка: не удалось выделить память для элемента очереди.\n");
         return 0;
     }
     new_elem->data = value;

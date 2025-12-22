@@ -18,15 +18,12 @@ int file_work(const char* file_name)
 {
     Queue q; 
     initialize(&q);
-    
-    // 1. Чтение из файла
     FILE* input = fopen(file_name, "r");
     if (!input) 
     {
         printf("Ошибка открытия файла: %s\n", file_name);
         return 1;
     }
-    
     int num;
     int count = 0;
     while (fscanf(input, "%d", &num) != EOF) 
@@ -35,22 +32,15 @@ int file_work(const char* file_name)
         count++;
     }
     fclose(input);
-    
     printf("Чисел прочитано: %d\n", count);
-    
     if (is_empty(&q)) 
     {
         printf("Очередь пуста, сортировка не требуется\n");
         return 1;
     }
-    
     puts("Неотсортированная очередь:");
     print_queue(&q);
-
-    // 2. Сортировка
     quick_sort_queue(&q);
-    
-    // 3. Запись в файл
     FILE* output = fopen("output.txt", "w");
     if (!output) 
     {
@@ -58,21 +48,17 @@ int file_work(const char* file_name)
         clear_queue(&q);
         return 1;
     }
-    
-    // Запись отсортированных данных
     int written = print_to_file(&q, output);
     printf("В файл записано %d элементов.\n", written);
     
     puts("Отсортированная очередь:");
     print_queue(&q);
-    
-    // Очистка памяти
     clear_queue(&q);
     fclose(output);
     return 0;
 }
 
-int power(int number, int degree)
+static int power(int number, int degree)
 {
     int result = number;
     for (int i = 1; i < degree; i++) result *= number;
@@ -101,4 +87,17 @@ int sort_time_comparison()
     fclose(file);
     fclose(output);
     return 0;
+}
+
+void read_queue(FILE* file)
+{
+    Queue q;
+    int num;
+    initialize(&q);
+    while(scanf("%d",&num)!=0)
+    {
+        append(&q,num);
+    }
+    print_to_file(&q,file);
+    clear_queue(&q);
 }
