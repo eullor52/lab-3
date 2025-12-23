@@ -6,7 +6,10 @@
 #include <limits.h>
 #include <ctype.h>
 
-double time_for_sort(Queue* q, int mode)
+#define START_TEST 8
+#define END_TEST 13
+
+static double time_for_sort(Queue* q, int mode)
 {
     struct timespec start, end;
     clock_gettime(CLOCK_MONOTONIC, &start);
@@ -75,7 +78,7 @@ int sort_time_comparison()
     FILE* file = fopen("test_data.txt","r");
     FILE* output = fopen("result_time.txt","w");
     if (!file) return 1;
-    for(int i = 10; i < 15; i++)
+    for(int i = START_TEST; i < END_TEST; i++)
     {
         for(int n = 0; n < power(2,i); n++)
         {
