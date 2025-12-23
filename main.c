@@ -37,8 +37,8 @@ int main(int argc, char** argv)
     {
         printf("Неизвестный параметр: %s\n", argv[1]);
         puts("Доступные параметры:");
-        puts("-file <имя_файла>");
-        puts("-time");
+        puts("--file <имя_файла>");
+        puts("--time");
         return 1;
     }
     

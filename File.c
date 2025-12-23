@@ -19,7 +19,7 @@ double time_for_sort(Queue* q, int mode)
 int file_work(const char* file_name) 
 {
     Queue q; 
-    initialize(&q);
+    initialize_queue(&q);
     FILE* input = fopen(file_name, "r");
     if (!input) 
     {
@@ -71,7 +71,7 @@ int sort_time_comparison()
 {
     int num;
     Queue q;
-    initialize(&q);
+    initialize_queue(&q);
     FILE* file = fopen("test_data.txt","r");
     FILE* output = fopen("result_time.txt","w");
     if (!file) return 1;

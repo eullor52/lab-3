@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int initialize(Queue* q) 
+int initialize_queue(Queue* q) 
 {
     if (!q) return 1;
     q->BegQ = NULL;
@@ -65,15 +65,15 @@ int queue_size(Queue* q)
     return q->size;
 }
 
-int copy_queue(Queue* dest, Queue* src) 
+int copy_queue(Queue* copy, Queue* queue_to_copy) 
 {
-    initialize(dest);
-    Elem* current = src->BegQ;
+    initialize_queue(copy);
+    Elem* current = queue_to_copy->BegQ;
     while (current != NULL) 
     {
-        if (!append(dest, current->data)) 
+        if (!append(copy, current->data)) 
         {
-            clear_queue(dest);
+            clear_queue(copy);
             return 0;
         }
         current = current->link;

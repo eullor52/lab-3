@@ -13,7 +13,7 @@ typedef struct {
     int size;
 }Queue; 
 
-int initialize(Queue* q);
+int initialize_queue(Queue* q);
 int append(Queue* q, int value);
 int delete(Queue* q, int* value);
 void clear_queue(Queue* q);
