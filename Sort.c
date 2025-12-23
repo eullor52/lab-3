@@ -72,7 +72,7 @@ static Elem* partition_queue(Elem* start, Elem* end, Elem** new_start, Elem** ne
             }
             if (start == current) 
             {
-                start = link;  // Обновляем начало, если удаляем первый элемент
+                start = link; 
             }
             current->link = NULL;
             tail->link = current;
@@ -89,7 +89,6 @@ static Elem* partition_queue(Elem* start, Elem* end, Elem** new_start, Elem** ne
     return pivot;
 }
 
-// Рекурсивная функция быстрой сортировки
 static Elem* quick_sort_recursive(Elem* start, Elem* end) 
 {
     if (start == NULL || start == end) 
@@ -100,8 +99,7 @@ static Elem* quick_sort_recursive(Elem* start, Elem* end)
     Elem* new_start = NULL;
     Elem* new_end = NULL;
     Elem* pivot = partition_queue(start, end, &new_start, &new_end);
-    
-    // Если есть элементы слева от pivot
+
     if (new_start != pivot) 
     {
         Elem* temp = new_start;
@@ -113,7 +111,7 @@ static Elem* quick_sort_recursive(Elem* start, Elem* end)
         
         new_start = quick_sort_recursive(new_start, temp);
         
-        // Находим конец левой части
+
         temp = new_start;
         while (temp->link != NULL) 
         {
@@ -122,7 +120,6 @@ static Elem* quick_sort_recursive(Elem* start, Elem* end)
         temp->link = pivot;
     }
     
-    // Сортируем правую часть
     if (pivot != new_end && pivot->link != NULL) 
     {
         pivot->link = quick_sort_recursive(pivot->link, new_end);
@@ -131,7 +128,6 @@ static Elem* quick_sort_recursive(Elem* start, Elem* end)
     return new_start;
 }
 
-// Основная функция сортировки очереди
 void quick_sort_queue(Queue* q) 
 {
     if (q->size <= 1) return;
@@ -141,7 +137,6 @@ void quick_sort_queue(Queue* q)
     
     q->BegQ = quick_sort_recursive(start, end);
     
-    // Обновляем конец очереди
     Elem* current = q->BegQ;
     while (current != NULL && current->link != NULL) 
     {

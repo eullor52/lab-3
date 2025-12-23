@@ -56,6 +56,8 @@ void clear_queue(Queue* q)
     {
         delete(q, &value);
     }
+    q->BegQ = NULL;
+    q->EndQ = NULL;
 }
 
 int queue_size(Queue* q) 

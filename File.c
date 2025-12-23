@@ -3,6 +3,8 @@
 #include "Queue.h"
 #include "Sort.h"
 #include <time.h>
+#include <limits.h>
+#include <ctype.h>
 
 double time_for_sort(Queue* q, int mode)
 {
@@ -89,15 +91,98 @@ int sort_time_comparison()
     return 0;
 }
 
-void read_queue(FILE* file)
+static int parse_int(const char *s, int *result) 
 {
-    Queue q;
-    int num;
-    initialize(&q);
-    while(scanf("%d",&num)!=0)
+    long value = 0;
+    int sign = 1;
+
+    if (*s == '-') 
     {
-        append(&q,num);
+        sign = -1;
+        s++;
     }
-    print_to_file(&q,file);
-    clear_queue(&q);
+
+    if (!isdigit(*s)) 
+    {
+        return 0; 
+    }
+
+    while (isdigit(*s)) 
+    {
+        int digit = *s - '0';
+        if (sign == 1) 
+        {
+            if (value > (INT_MAX - digit) / 10) 
+            {
+                return -1;
+            }
+        } 
+        else 
+        {
+            if (-value < (INT_MIN + digit) / 10) 
+            {
+                return -1; 
+            }
+        }
+        value = value * 10 + digit;
+        s++;
+    }
+    *result = (int)(sign * value);
+    return 1;
+}
+
+int read_numbers_and_save(const char *filename) 
+{
+    char *buffer = NULL;
+    size_t size = 0;
+    int c;
+
+    printf("Введите целые числа через пробел:\n");
+
+    while ((c = getchar()) != '\n' && c != EOF) 
+    {
+        char *tmp = realloc(buffer, size + 2);
+        if (!tmp) 
+        {
+            free(buffer);
+            return -1; 
+        }
+        buffer = tmp;
+        buffer[size++] = (char)c;
+        buffer[size] = '\0';
+    }
+
+    if (!buffer) 
+    {
+        return -2; 
+    }
+
+    FILE *file = fopen(filename, "w");
+    if (!file) 
+    {
+        free(buffer);
+        return -3; 
+    }
+
+    char *p = buffer;
+    while (*p) 
+    {
+        while (*p == ' ') p++;
+        if (*p == '\0') break;
+        int value;
+        int res = parse_int(p, &value);
+        if (res != 1) 
+        {
+            fclose(file);
+            free(buffer);
+            return -4;
+        }
+        fprintf(file, "%d ", value);
+        if (*p == '-') p++;
+        while (isdigit(*p)) p++;
+    }
+
+    fclose(file);
+    free(buffer);
+    return 0;
 }

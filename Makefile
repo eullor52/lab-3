@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra
-TARGET = program.exe
+TARGET = program
 SRCS = main.c Queue.c Sort.c File.c 
 OBJS = main.o Sort.o Queue.o File.o	
 DATA = output.txt result_time.txt
