@@ -63,6 +63,45 @@ int file_work(const char* file_name)
     return 0;
 }
 
+int print_to_file(Queue* q, FILE* file) 
+{
+    if (is_empty(q)) return 0;
+    Elem* current = q->BegQ;
+    int count = 0;
+    while (current != NULL) 
+    {
+        fprintf(file, "%d ", current->data);
+        current = current->link;
+        count++;
+        if (count % 20 == 0 && current != NULL) fputc(10,file);
+    }
+    return count;
+    fputc(10,file);
+}
+
+int print_queue(Queue* q) 
+{
+    if (is_empty(q)) 
+    {
+        printf("(пусто)\n");
+        return 0;
+    }
+    Elem* current = q->BegQ;
+    int count = 0;
+    while (current != NULL) 
+    {
+        printf("%d ", current->data);
+        current = current->link;
+        count++;
+        if (count % 10 == 0 && current != NULL) 
+        {
+            puts("");
+        }
+    }
+    puts("");
+    return count;
+}
+
 static int power(int number, int degree)
 {
     int result = number;

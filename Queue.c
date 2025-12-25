@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-int initialize_queue(Queue* q) 
+int initialize_queue(Queue* q)
 {
     if (!q) return 1;
     q->BegQ = NULL;
@@ -11,194 +11,140 @@ int initialize_queue(Queue* q)
     return 0;
 }
 
-int append(Queue* q, int value) 
+int queue_size(Queue* q)
+{
+    return q->size;
+}
+
+int is_empty(Queue* q)
+{
+    return q->BegQ == NULL;
+}
+
+int append(Queue* q, int value)
 {
     Elem* new_elem = (Elem*)malloc(sizeof(Elem));
-    if (!new_elem) 
+
+    if (!new_elem)
     {
         fprintf(stderr, "Ошибка: не удалось выделить память для элемента очереди.\n");
-        return 0;
+        return 1;
     }
+
     new_elem->data = value;
     new_elem->link = NULL;
-    if (q->EndQ == NULL)
+
+    if (is_empty(q))
     {
         q->BegQ = new_elem;
     }
-    else 
+    else
     {
         q->EndQ->link = new_elem;
     }
     q->EndQ = new_elem;
-    q->size++;
-    return 1;
+    ++q->size;
+    return 0;
 }
 
-int delete(Queue* q, int* value) 
+int delete(Queue* q, int* value)
 {
-    if (q->BegQ == NULL)  return 0;
+    if (is_empty(q))  return 1;
+
     Elem* temp = q->BegQ;
     *value = temp->data;
     q->BegQ = q->BegQ->link;
-    if (q->BegQ == NULL) 
-    {
-        q->EndQ = NULL;
-    }
+
+    if (q->BegQ == NULL) q->EndQ = NULL;
+
     free(temp);
-    q->size--;
-    return 1;
+    --q->size;
+    return 0;
 }
 
 void clear_queue(Queue* q) 
 {
     int value;
-    while (!is_empty(q)) 
-    {
-        delete(q, &value);
-    }
+
+    while (!delete(q, &value));
     q->BegQ = NULL;
     q->EndQ = NULL;
 }
 
-int queue_size(Queue* q) 
-{
-    return q->size;
-}
-
 int copy_queue(Queue* copy, Queue* queue_to_copy) 
 {
-    initialize_queue(copy);
+    int err = 0;
+    err = initialize_queue(copy);
     Elem* current = queue_to_copy->BegQ;
+
     while (current != NULL) 
     {
-        if (!append(copy, current->data)) 
+        if (!append(copy, current->data))
         {
             clear_queue(copy);
-            return 0;
+            return 1;
         }
         current = current->link;
     }
-    return 1;
+    return 0;
 }
 
-int print_queue(Queue* q) 
+Elem* get_elem_at(Queue* q, int index)
 {
-    if (is_empty(q)) 
-    {
-        printf("(пусто)\n");
-        return 0;
-    }
+    if (index < 0 || index >= queue_size(q)) return NULL;
     Elem* current = q->BegQ;
-    int count = 0;
-    while (current != NULL) 
-    {
-        printf("%d ", current->data);
-        current = current->link;
-        count++;
-        if (count % 10 == 0 && current != NULL) 
-        {
-            puts("");
-        }
-    }
-    puts("");
-    return count;
-}
 
-int print_to_file(Queue* q, FILE* file) 
-{
-    if (is_empty(q)) return 0;
-    Elem* current = q->BegQ;
-    int count = 0;
-    while (current != NULL) 
-    {
-        fprintf(file, "%d ", current->data);
-        current = current->link;
-        count++;
-        if (count % 20 == 0 && current != NULL) fputc(10,file);
-    }
-    return count;
-    fputc(10,file);
-}
+    for (int i = 0; i < index; i++) current = current->link;
 
-int is_empty(Queue* q) 
-{
-    return q->BegQ == NULL;
-}
-
-Elem* get_elem_at(Queue* q, int index) 
-{
-    if (index < 0 || index >= q->size) 
-    {
-        return NULL;
-    }
-    Elem* current = q->BegQ;
-    for (int i = 0; i < index; i++) 
-    {
-        current = current->link;
-    }
     return current;
 }
 
 Elem* get_prev_elem(Queue* q, Elem* target) 
 {
-    if (q->BegQ == NULL || target == q->BegQ) 
-    {
-        return NULL;
-    }
+    if (q->BegQ == NULL || target == q->BegQ) return NULL;
     Elem* current = q->BegQ;
-    while (current != NULL && current->link != target) 
-    {
-        current = current->link;
-    }
+
+    while (current != NULL && current->link != target) current = current->link;
     return current;
 }
 
 int extract_elem(Queue* q, Elem* prev, Elem* elem) 
 {
-    if (elem == NULL) return 0;
-    if (prev == NULL) 
+    if (elem == NULL) return 1;
+
+    if (prev == NULL)
     {
         q->BegQ = elem->link;
-        if (q->BegQ == NULL) 
-        {
-            q->EndQ = NULL;
-        }
-    } 
-    else 
+        if (q->BegQ == NULL) q->EndQ = NULL;
+    }
+    else
     {
         prev->link = elem->link;
-        if (elem == q->EndQ)
-        {
-            q->EndQ = prev;
-        }
+        if (elem == q->EndQ) q->EndQ = prev;
     }
+
     elem->link = NULL;
-    q->size--;
-    return 1;
+    --q->size;
+    return 0;
 }
 
 int insert_after(Queue* q, Elem* prev, Elem* elem) 
 {
     if (elem == NULL) return 0;
     
-    if (prev == NULL) 
+    if (prev == NULL)
     {
         elem->link = q->BegQ;
         q->BegQ = elem;
-        if (q->EndQ == NULL) 
-        {
-            q->EndQ = elem;
-        }
-    } 
-    else 
+        if (q->EndQ == NULL) q->EndQ = elem;
+    }
+    else
     {
         elem->link = prev->link;
         prev->link = elem;
-        if (prev == q->EndQ) 
-        {
-            q->EndQ = elem;
-        }
+        if (prev == q->EndQ) q->EndQ = elem;
     }
-    q->size++;
+
+    ++q->size;
     return 1;
 }

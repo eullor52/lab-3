@@ -1,47 +1,43 @@
 #include "Sort.h"
 #include <stdio.h>
 
-static Elem* find_min_elem(Elem* start) 
+static Elem* find_min_elem(Elem* start)
 {
     if (start == NULL) return NULL;
+
     Elem* min_elem = start;
     Elem* current = start->link;
-    while (current != NULL) 
+
+    while (current != NULL)
     {
-        if (current->data < min_elem->data) 
-        {
-            min_elem = current;
-        }
+        if (current->data < min_elem->data) min_elem = current;
         current = current->link;
     }
     return min_elem;
 }
 
-void selection_sort_queue(Queue* q) 
+void selection_sort_queue(Queue* q)
 {
     if (q->size <= 1) return;
-    Elem* sorted_end = NULL;  
-    while (sorted_end != q->EndQ) 
+
+    Elem* sorted_end = NULL;
+    Elem* start_search;
+    Elem* min_elem;
+    Elem* prev_min;
+
+    while (sorted_end != q->EndQ)
     {
-        Elem* start_search = (sorted_end == NULL) ? q->BegQ : sorted_end->link;
-        Elem* min_elem = find_min_elem(start_search);
-        if (min_elem != start_search) 
+        start_search = (sorted_end == NULL) ? q->BegQ : sorted_end->link;
+        min_elem = find_min_elem(start_search);
+        if (min_elem != start_search)
         {
-            Elem* prev_min = get_prev_elem(q, min_elem);
+            prev_min = get_prev_elem(q, min_elem);
             extract_elem(q, prev_min, min_elem);
-            if (sorted_end == NULL) 
-            {
-                insert_after(q, NULL, min_elem);
-            } else 
-            {
-                insert_after(q, sorted_end, min_elem);
-            }
-            sorted_end = min_elem;
-        } 
-        else 
-        {
+            if (sorted_end == NULL) insert_after(q, NULL, min_elem);
+            else insert_after(q, sorted_end, min_elem);
             sorted_end = min_elem;
         }
+        else sorted_end = min_elem;
     }
 }
 
@@ -52,9 +48,9 @@ static Elem* partition_queue(Elem* start, Elem* end, Elem** new_start, Elem** ne
     Elem* current = start;
     Elem* tail = pivot;
     
-    while (current != pivot) 
+    while (current != pivot)
     {
-        if (current->data < pivot->data) 
+        if (current->data < pivot->data)
         {
             if (*new_start == NULL) 
             {
@@ -62,11 +58,11 @@ static Elem* partition_queue(Elem* start, Elem* end, Elem** new_start, Elem** ne
             }
             prev = current;
             current = current->link;
-        } 
+        }
         else 
         {
             Elem* link = current->link;
-            if (prev) 
+            if (prev)
             {
                 prev->link = link;
             }
@@ -81,7 +77,7 @@ static Elem* partition_queue(Elem* start, Elem* end, Elem** new_start, Elem** ne
         }
     }
     
-    if (*new_start == NULL) 
+    if (*new_start == NULL)
     {
         *new_start = pivot;
     }
@@ -138,7 +134,7 @@ void quick_sort_queue(Queue* q)
     q->BegQ = quick_sort_recursive(start, end);
     
     Elem* current = q->BegQ;
-    while (current != NULL && current->link != NULL) 
+    while (current != NULL && current->link != NULL)
     {
         current = current->link;
     }
