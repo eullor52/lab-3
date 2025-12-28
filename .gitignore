@@ -1,7 +1,3 @@
-main.o
-Sort.o
-Queue.o
-File.o
-output.txt
+objects
 time_result.txt
 program.exe

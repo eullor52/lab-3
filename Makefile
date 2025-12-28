@@ -6,7 +6,7 @@ SRC_DIR = sources
 OBJ_DIR = objects
 INC_DIR = headers
 
-TARGET = program
+TARGET = program.exe
 
 SRCS = $(wildcard $(SRC_DIR)/*.c)
 

@@ -40,16 +40,23 @@ int print_queue(Queue* q)
     }
     Elem* current = q->BegQ;
     int count = 0;
+    putchar('[');
     while (current != NULL) 
     {
-        printf("%d ", current->data);
+        printf("%d", current->data);
+        if (current->link != NULL)
+        {
+            putchar(',');
+            putchar(' ');
+        }
         current = current->link;
         count++;
-        if (count % 10 == 0 && current != NULL) 
+        if (count % 25 == 0 && current != NULL) 
         {
             puts("");
         }
     }
+    putchar(']');
     puts("");
     return count;
 }
@@ -120,8 +127,8 @@ int sort_time_comparison()
     int num;
     Queue q;
     initialize_queue(&q);
-    FILE* file = fopen("lab-3/data/test_data.txt","r");
-    FILE* output = fopen("lab-3/data/result_time.txt","w");
+    FILE* file = fopen("data/test_data.txt","r");
+    FILE* output = fopen("data/result_time.txt","w");
     if (!file) return 1;
     for(int i = START_TEST; i < END_TEST; i++)
     {
@@ -185,7 +192,7 @@ int read_numbers_and_save(const char *filename)
     size_t size = 0;
     int c;
 
-    printf("Введите целые числа через пробел:\n");
+    puts("Введите новую очередь (целые числа через пробел):");
 
     while ((c = getchar()) != '\n' && c != EOF) 
     {

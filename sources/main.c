@@ -22,7 +22,6 @@ int main(int argc, char** argv)
         for(;;)
         {
             if (result == 0) err = file_work(argv[2]);
-            puts("Введите новую очередь:");
             result = read_numbers_and_save(argv[2]);
             if (result == 0)
             {
