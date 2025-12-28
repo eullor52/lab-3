@@ -73,8 +73,7 @@ void clear_queue(Queue* q)
 
 int copy_queue(Queue* copy, Queue* queue_to_copy) 
 {
-    int err = 0;
-    err = initialize_queue(copy);
+    if (initialize_queue(copy)) return 1;
     Elem* current = queue_to_copy->BegQ;
 
     while (current != NULL) 

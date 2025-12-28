@@ -6,6 +6,7 @@
 
 int main(int argc, char** argv)
 {
+    char choice;
     int err = 0;
     if (argc < 2) 
     {
@@ -17,16 +18,51 @@ int main(int argc, char** argv)
 
     if (strcmp(argv[1], "--file") == 0)
     {
-        err = file_work(argv[2]);
-        puts("Введите новую очередь:");
-        int result = read_numbers_and_save(argv[2]);
-        if (result == 0)
+        int result = 0;
+        for(;;)
         {
-            puts("Запись прошла успешно.");  
-        }
-        else
-        {
-            printf("Ошибка записи чисел в файл, код ошибки: %d\n", result);
+            if (result == 0) err = file_work(argv[2]);
+            puts("Введите новую очередь:");
+            result = read_numbers_and_save(argv[2]);
+            if (result == 0)
+            {
+                puts("Запись прошла успешно.");
+            }
+            else
+            {
+                printf("Ошибка записи чисел в файл, код ошибки: %d\n", result);
+            }
+            for(;;)
+            {
+                puts("Для завершения введите N, для продолжения - Y:");
+                if (scanf("%c",&choice) != 1)
+                {
+                    puts("Ошибка: неизвестный символ.");
+                    clean_input_buffer();
+                    continue;
+                }
+                if (choice == 'Y' || choice == 'N')
+                {
+                    break;
+                }
+                else
+                {
+                    puts("Ошибка: неизвестный символ.");
+                    clean_input_buffer();
+                    continue;
+                }
+            }
+            if (choice == 'Y')
+            {
+                puts("================================================");
+                clean_input_buffer();
+                continue;
+            } 
+            else
+            {
+                puts("Выполнение програмы завершено.");
+                break;
+            }
         }
     }
     else if (strcmp(argv[1], "--time") == 0)

@@ -6,8 +6,53 @@
 #include <limits.h>
 #include <ctype.h>
 
-#define START_TEST 8
-#define END_TEST 13
+#define START_TEST 10
+#define END_TEST 15
+
+void clean_input_buffer()
+{
+    int c;
+    while((c = getchar()) != '\n' && c != EOF);
+}
+
+int fprint_queue(Queue* q, FILE* file) 
+{
+    if (is_empty(q)) return 0;
+    Elem* current = q->BegQ;
+    int count = 0;
+    while (current != NULL) 
+    {
+        fprintf(file, "%d ", current->data);
+        current = current->link;
+        count++;
+        if (count % 20 == 0 && current != NULL) fputc(10,file);
+    }
+    return count;
+    fputc(10,file);
+}
+
+int print_queue(Queue* q) 
+{
+    if (is_empty(q)) 
+    {
+        printf("(пусто)\n");
+        return 0;
+    }
+    Elem* current = q->BegQ;
+    int count = 0;
+    while (current != NULL) 
+    {
+        printf("%d ", current->data);
+        current = current->link;
+        count++;
+        if (count % 10 == 0 && current != NULL) 
+        {
+            puts("");
+        }
+    }
+    puts("");
+    return count;
+}
 
 static double time_for_sort(Queue* q, int mode)
 {
@@ -53,7 +98,7 @@ int file_work(const char* file_name)
         clear_queue(&q);
         return 1;
     }
-    int written = print_to_file(&q, output);
+    int written = fprint_queue(&q, output);
     printf("В файл записано %d элементов.\n", written);
     
     puts("Отсортированная очередь:");
@@ -61,45 +106,6 @@ int file_work(const char* file_name)
     clear_queue(&q);
     fclose(output);
     return 0;
-}
-
-int print_to_file(Queue* q, FILE* file) 
-{
-    if (is_empty(q)) return 0;
-    Elem* current = q->BegQ;
-    int count = 0;
-    while (current != NULL) 
-    {
-        fprintf(file, "%d ", current->data);
-        current = current->link;
-        count++;
-        if (count % 20 == 0 && current != NULL) fputc(10,file);
-    }
-    return count;
-    fputc(10,file);
-}
-
-int print_queue(Queue* q) 
-{
-    if (is_empty(q)) 
-    {
-        printf("(пусто)\n");
-        return 0;
-    }
-    Elem* current = q->BegQ;
-    int count = 0;
-    while (current != NULL) 
-    {
-        printf("%d ", current->data);
-        current = current->link;
-        count++;
-        if (count % 10 == 0 && current != NULL) 
-        {
-            puts("");
-        }
-    }
-    puts("");
-    return count;
 }
 
 static int power(int number, int degree)
@@ -144,24 +150,24 @@ static int parse_int(const char *s, int *result)
         s++;
     }
 
-    if (!isdigit(*s)) 
+    if (!isdigit(*s))
     {
-        return 0; 
+        return 1;
     }
 
-    while (isdigit(*s)) 
+    while (isdigit(*s))
     {
         int digit = *s - '0';
-        if (sign == 1) 
+        if (sign == 1)
         {
-            if (value > (INT_MAX - digit) / 10) 
+            if (value > (INT_MAX - digit) / 10)
             {
                 return -1;
             }
         } 
         else 
         {
-            if (-value < (INT_MIN + digit) / 10) 
+            if (-value < (INT_MIN + digit) / 10)
             {
                 return -1; 
             }
@@ -170,10 +176,10 @@ static int parse_int(const char *s, int *result)
         s++;
     }
     *result = (int)(sign * value);
-    return 1;
+    return 0;
 }
 
-int read_numbers_and_save(const char *filename) 
+int read_numbers_and_save(const char *filename)
 {
     char *buffer = NULL;
     size_t size = 0;
@@ -194,26 +200,25 @@ int read_numbers_and_save(const char *filename)
         buffer[size] = '\0';
     }
 
-    if (!buffer) 
+    if (!buffer)
     {
-        return -2; 
+        return -2;
     }
 
     FILE *file = fopen(filename, "w");
-    if (!file) 
+    if (!file)
     {
         free(buffer);
-        return -3; 
+        return -3;
     }
 
     char *p = buffer;
-    while (*p) 
+    while (*p)
     {
         while (*p == ' ') p++;
         if (*p == '\0') break;
         int value;
-        int res = parse_int(p, &value);
-        if (res != 1) 
+        if (parse_int(p,&value) != 0)
         {
             fclose(file);
             free(buffer);
