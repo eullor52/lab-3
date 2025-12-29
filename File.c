@@ -98,7 +98,7 @@ int file_work(const char* file_name)
     puts("Неотсортированная очередь:");
     print_queue(&q);
     quick_sort_queue(&q);
-    /*FILE* output = fopen("lab-3/data/output.txt", "w");
+    /*FILE* output = fopen("output.txt", "w");
     if (!output) 
     {
         printf("Ошибка создания output.txt\n");
@@ -127,8 +127,8 @@ int sort_time_comparison()
     int num;
     Queue q;
     initialize_queue(&q);
-    FILE* file = fopen("data/test_data.txt","r");
-    FILE* output = fopen("data/result_time.txt","w");
+    FILE* file = fopen("test_data.txt","r");
+    FILE* output = fopen("result_time.txt","w");
     if (!file) return 1;
     for(int i = START_TEST; i < END_TEST; i++)
     {
@@ -225,7 +225,7 @@ int read_numbers_and_save(const char *filename)
         while (*p == ' ') p++;
         if (*p == '\0') break;
         int value;
-        if (parse_int(p,&value) != 0)
+        if (parse_int(p, &value) != 0)
         {
             fclose(file);
             free(buffer);

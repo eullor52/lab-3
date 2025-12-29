@@ -7,13 +7,7 @@ int initialize_queue(Queue* q)
     if (!q) return 1;
     q->BegQ = NULL;
     q->EndQ = NULL;
-    q->size = 0;
     return 0;
-}
-
-int queue_size(Queue* q)
-{
-    return q->size;
 }
 
 int is_empty(Queue* q)
@@ -43,7 +37,6 @@ int append(Queue* q, int value)
         q->EndQ->link = new_elem;
     }
     q->EndQ = new_elem;
-    ++q->size;
     return 0;
 }
 
@@ -58,7 +51,6 @@ int delete(Queue* q, int* value)
     if (q->BegQ == NULL) q->EndQ = NULL;
 
     free(temp);
-    --q->size;
     return 0;
 }
 
@@ -88,16 +80,6 @@ int copy_queue(Queue* copy, Queue* queue_to_copy)
     return 0;
 }
 
-Elem* get_elem_at(Queue* q, int index)
-{
-    if (index < 0 || index >= queue_size(q)) return NULL;
-    Elem* current = q->BegQ;
-
-    for (int i = 0; i < index; i++) current = current->link;
-
-    return current;
-}
-
 Elem* get_prev_elem(Queue* q, Elem* target) 
 {
     if (q->BegQ == NULL || target == q->BegQ) return NULL;
@@ -123,7 +105,6 @@ int extract_elem(Queue* q, Elem* prev, Elem* elem)
     }
 
     elem->link = NULL;
-    --q->size;
     return 0;
 }
 
@@ -144,6 +125,5 @@ int insert_after(Queue* q, Elem* prev, Elem* elem)
         if (prev == q->EndQ) q->EndQ = elem;
     }
 
-    ++q->size;
     return 1;
 }

@@ -1,35 +1,25 @@
 CC = gcc
+CFLAGS = -Wall -Wextra
 
-CFLAGS = -Wall -Wextra -I./headers
+TARGET = program
 
-SRC_DIR = sources
-OBJ_DIR = objects
-INC_DIR = headers
+SRCS = main.c File.c Sort.o Queue.c 
+OBJS = main.o File.o Sort.o Queue.o
 
-TARGET = program.exe
-
-SRCS = $(wildcard $(SRC_DIR)/*.c)
-
-OBJS = $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRCS))
-
-all: $(OBJ_DIR) $(TARGET)
-
-$(OBJ_DIR):
-	mkdir -p $(OBJ_DIR)
+all: $(TARGET)
 
 $(TARGET): $(OBJS)
-	$(CC) $(OBJS) -o $@
+	$(CC) $(CFLAGS) -o $@ $^
 
-$(OBJ_DIR)/%.o: $(SRC_DIR)/%.c
+%.o: %.c 
 	$(CC) $(CFLAGS) -c $< -o $@
 
-DEP = $(OBJS:.o=.d)
--include $(DEP)
-
-$(OBJ_DIR)/%.d: $(SRC_DIR)/%.c
-	@$(CPP) $(CFLAGS) $< -MM -MT $(@:.d=.o) > $@
-
 clean:
-	rm -rf $(OBJ_DIR) $(TARGET)
+	rm -f $(OBJS) $(TARGET)
+
+Queue.o: Queue.h
+Sort.o: Queue.h Sort.h
+File.o: Queue.h Sort.h File.h
+main.o: Queue.h Sort.h File.h
 
 .PHONY: all clean
